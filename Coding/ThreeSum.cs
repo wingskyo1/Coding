@@ -24,19 +24,21 @@ namespace ThreeSum
     //Result : 313 / 313 test cases passed.
     //Status: Memory Limit Exceeded
     //Submitted: 0 minutes ago
-    //All case passed but Memory Limit Exceeded.....damn
+    //All case passed but Memory Limit Exceeded.....nooooo
+    //不知道為什麼空間複雜度使用超過限制
+    //因為呼叫了n次 twoSum 空間O(n) 變成了 O{n^2)?
     public class Solution
     {
         public IList<IList<int>> ThreeSum(int[] nums)
         {
             IList<IList<int>> result = new List<IList<int>>();
+            //Sort first
             Array.Sort(nums);
-
             for (var i = 0; i < nums.Length; i++)
             {
                 if (i > 0 && nums[i] == nums[i - 1])
                     continue;
-                //only remove one
+                //remove pickOne
                 var data = nums.Where((val, index) => index > i).ToArray();
                 var partAnswers = TwoSum(data, -nums[i]);
                 if (partAnswers.Count() > 0)
@@ -53,9 +55,9 @@ namespace ThreeSum
         {
             IList<IList<int>> firstAns = new List<IList<int>>();
             var dic = new Dictionary<int, int>();
-            //solve duplicate case  
+            // prePick solve duplicate case  
             int? prePick = null;
-            for (var i = 1; i < nums.Length; i++)
+            for (var i = 0; i < nums.Length; i++)
             {
                 //solve [0,0,0,0+] case
                 if (i > 1 && nums[i] == nums[i - 2])
@@ -79,4 +81,48 @@ namespace ThreeSum
     }
 
 
+
+
+
+
+
+    //參考JAVA版本  O(N^2)
+    //Idea : Select one first ,  then select the other 
+    //not using twoSum
+    //Submission Result: Accepted 
+
+    public class Solution2
+    {
+        public IList<IList<int>> ThreeSum(int[] nums)
+        {
+            IList<IList<int>> result = new List<IList<int>>();
+            //Sort first  
+            Array.Sort(nums);
+
+            //Select one first
+            for (var i = 0; i < nums.Length; i++)
+            {
+                if (i > 0 && nums[i] == nums[i - 1])
+                    continue;
+                int start = i + 1, end = nums.Length - 1, target = -nums[i];
+                //Approach from both end
+                while (start < end)
+                {
+                    if (nums[start] + nums[end] == target)
+                    {
+                        result.Add(new int[] { nums[start], nums[end], -target });
+                        //skip the same numbers if added
+                        while (start < end && nums[start] == nums[start + 1]) start++;
+                        while (start < end && nums[end] == nums[end - 1]) end--;
+                        start++; end--;
+                    }
+                    else if (nums[start] + nums[end] < target)
+                        start++;
+                    else
+                        end--;
+                }
+            }
+            return result;
+        }
+    }
 }
